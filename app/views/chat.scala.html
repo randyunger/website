@@ -1,0 +1,93 @@
+@(message: String)
+
+@main("Welcome to Play") {
+
+    <form>
+        <input type="text"/>
+        <button onclick="sendMsg()">Send</button>
+    </form>
+}
+
+<script type="text/javascript">
+    window.hi = "Randy";
+//    var exampleSocket = new WebSocket("ws://localhost:9000/socket", "chatProtocol");
+//    exampleSocket.send("Tezt msg")
+
+    var ws = new WrapperWS();
+    ws.send("hihi");
+
+
+
+    function WrapperWS() {
+        if ("WebSocket" in window) {
+            var ws = new WebSocket("ws://localhost:9000/socket");
+            var self = this;
+
+            ws.onopen = function () {
+                console.log("Opening a connection...");
+                window.identified = false;
+            };
+
+            ws.onclose = function (evt) {
+                console.log("I'm sorry. Bye!");
+            };
+
+            ws.onmessage = function (evt) {
+                // handle messages here
+            };
+
+            ws.onerror = function (evt) {
+                console.log("ERR: " + evt.data);
+            };
+
+            this.send = function (message, callback) {
+                this.waitForConnection(function () {
+                    ws.send(message);
+                    if (typeof callback !== 'undefined') {
+                        callback();
+                    }
+                }, 1000);
+            };
+
+            this.waitForConnection = function (callback, interval) {
+                if (ws.readyState === 1) {
+                    callback();
+                } else {
+                    var that = this;
+                    // optional: implement backoff for interval here
+                    setTimeout(function () {
+                        that.waitForConnection(callback, interval);
+                    }, interval);
+                }
+            };
+
+//            this.write = function () {
+//                if (!window.identified) {
+//                    connection.ident();
+//                    console.debug("Wasn't identified earlier. It is now.");
+//                }
+//                ws.send(theText.value);
+//            };
+//
+//            this.ident = function () {
+//                var session = "Test";
+//                try {
+//                    ws.send(session);
+//                } catch (error) {
+//                    if (error instanceof InvalidStateError) {
+//                        // possibly still 'CONNECTING'
+//                        if (ws.readyState !== 1) {
+//                            var waitSend = setInterval(ws.send(session), 1000);
+//                        }
+//                    }
+//                }
+//                window.identified = true;
+//                theText.value = "Hello!";
+//                say.click();
+//                theText.disabled = false;
+//            };
+
+        };
+
+    }
+</script>
